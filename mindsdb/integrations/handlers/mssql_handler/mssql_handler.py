@@ -283,8 +283,8 @@ class SqlServerHandler(DatabaseHandler):
 
         query = f"""
             SELECT
-                table_schema,
-                table_name,
+                CONCAT('[',table_schema,']') as table_schema,
+                CONCAT('[',table_name,']') as table_name,
                 table_type
             FROM {self.database}.INFORMATION_SCHEMA.TABLES
             WHERE TABLE_TYPE in ('BASE TABLE', 'VIEW');
@@ -306,7 +306,7 @@ class SqlServerHandler(DatabaseHandler):
 
         query = f"""
             SELECT
-                COLUMN_NAME,
+                CONCAT('[',COLUMN_NAME,']') as COLUMN_NAME,
                 DATA_TYPE,
                 ORDINAL_POSITION,
                 COLUMN_DEFAULT,
