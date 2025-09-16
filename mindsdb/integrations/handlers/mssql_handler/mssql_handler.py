@@ -289,7 +289,14 @@ class SqlServerHandler(DatabaseHandler):
             FROM {self.database}.INFORMATION_SCHEMA.TABLES
             WHERE TABLE_TYPE in ('BASE TABLE', 'VIEW');
         """
-        return self.native_query(query)
+
+        response = self.native_query(query)
+
+        if response.type == RESPONSE_TYPE.TABLE and not response.data_frame.empty:
+            response.data_frame['table_schema'] = '[' + response.data_frame['table_schema'] + ']'
+            response.data_frame['table_name'] = '[' + response.data_frame['table_name'] + ']'
+
+        return response
 
     def get_columns(self, table_name) -> Response:
         """
@@ -324,5 +331,9 @@ class SqlServerHandler(DatabaseHandler):
                 table_name = '{table_name}'
         """
         result = self.native_query(query)
+
+        if result.type == RESPONSE_TYPE.TABLE and not result.data_frame.empty:
+            result.data_frame['COLUMN_NAME'] = '[' + result.data_frame['COLUMN_NAME'] + ']'
+
         result.to_columns_table_response(map_type_fn=_map_type)
         return result
